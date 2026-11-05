@@ -1,13 +1,33 @@
 {
   "name": "latex-stack-default-branch",
   "target": "branch",
-  "conditions": { "ref_name": { "include": ["refs/heads/main"], "exclude": [] } },
+  "conditions": {
+    "ref_name": {
+      "include": [
+        "refs/heads/main"
+      ],
+      "exclude": []
+    }
+  },
   "rules": [
-    { "type": "creation" },
-    { "type": "deletion" },
-    { "type": "update", "parameters": { "update_allows_fetch_and_merge": false } },
-    { "type": "required_linear_history" },
-    { "type": "required_signatures" },
+    {
+      "type": "creation"
+    },
+    {
+      "type": "deletion"
+    },
+    {
+      "type": "update",
+      "parameters": {
+        "update_allows_fetch_and_merge": false
+      }
+    },
+    {
+      "type": "required_linear_history"
+    },
+    {
+      "type": "required_signatures"
+    },
     {
       "type": "pull_request",
       "parameters": {
@@ -24,18 +44,19 @@
         "strict_required_status_checks_policy": true,
         "do_not_enforce_on_create": false,
         "required_status_checks": [
-          { "context": "latex-build", "integration_id": 1530 },
-          { "context": "cite-check", "integration_id": 1530 },
-          { "context": "pre-commit", "integration_id": 1530 }
+          {
+            "context": "latex-build"
+          },
+          {
+            "context": "cite-check"
+          },
+          {
+            "context": "pre-commit"
+          },
+          {
+            "context": "title-check"
+          }
         ]
-      }
-    },
-    {
-      "type": "commit_message_pattern",
-      "parameters": {
-        "name": "conventional prefix",
-        "operator": "starts_with",
-        "pattern": "^(paper|fix|ci|docs|chore|feat|refactor)(\\(.+\\))?: "
       }
     }
   ],
