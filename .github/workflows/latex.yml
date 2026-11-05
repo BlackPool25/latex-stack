@@ -79,7 +79,7 @@ jobs:
       image: texlive/texlive:TL2025-historic@sha256:dbd65d778eb83de9b45fb0a8deb3afe44cbbaba2272e4e1e644e94dda52c7109
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-      - run: apt-get update -qq && apt-get install -qy python3-pip && pip install --quiet --break-system-packages pre-commit && pre-commit run --all-files --show-diff-on-failure
+      - run: apt-get update -qq && apt-get install -qy python3-pip && pip install --quiet --break-system-packages --ignore-installed pre-commit && pre-commit run --all-files --show-diff-on-failure
 
   preview:
     needs: [latex-build]
