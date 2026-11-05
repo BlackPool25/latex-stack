@@ -1,0 +1,8 @@
+{
+  "title": "REPLACE: Paper Title",
+  "upload_type": "publication",
+  "publication_type": "conferencepaper",
+  "creators": [{ "name": "Author, First", "affiliation": "Dept., University" }],
+  "access_right": "open",
+  "license": "MIT"
+}

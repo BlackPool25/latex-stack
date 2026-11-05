@@ -1,28 +1,36 @@
-# AGENTS.md — rules for AI agents working in this repo
+# Agent rules — latex-stack (IEEE conference, LuaLaTeX-only)
 
-## Stack
-- Venue default: IEEE conference (`paper/main.tex`, IEEEtran, conf mode).
-- Engine: LuaLaTeX only, via `make paper`. Never add `fontspec`.
-- Bibliography: classic BibTeX + `IEEEtran.bst` for submissions.
-  biblatex is allowed in drafts only, never in `main.tex`.
+## Stack (do not change unilaterally)
+- Build: `make paper` (LuaLaTeX, warnings-as-errors). Container-first: Makefile
+  auto-uses the pinned toolchain image when local TeX is incomplete.
+- Lint: `make lint` (paper/.chktexrc). Format: `make format` (paper/latexindent.yaml).
+- Citations: `make verify-refs` (blocking). Placeholder/EXAMPLE DOIs fail CI — replace with real ones.
+- MCP: `.mcp.json` pins the servers; shell `make` is the fallback. Never invent another build path.
 
-## Definition of done (all must pass)
-1. `make lint` exits 0 (ChkTeX must-fail gate).
-2. `make paper` exits 0 (warnings-as-errors; force with `latexmk -g` if stale).
-3. No `undefined`/`multiply defined` in `main.log`.
-4. Every number in prose matches a table, figure, or log.
-5. Every `\cite` resolves: key exists in `refs.bib`, DOI verified via
-   CrossRef/Semantic Scholar. Fabricated citations = task failure.
+## Workflow
+- One paper = one branch `paper/<slug>[-<agent>]`. Never push to `main`.
+- Rebase before pushing: `git pull --rebase --autostash`. Conflicts: keep both
+  text, never delete the other author's sentences; ask if semantic.
+- Sentence-per-line in `.tex` (one sentence per line, wrap at 80 cols) — this is
+  what makes merges and diffs readable. `.gitconfig` word-diff is auto-loaded by setup.sh.
+- Commits: `paper:/fix:/ci:/docs:/chore:` prefix, one file per commit.
+  Sign every commit (SSH signing per docs/setup.md).
+  Add trailer for agent work: `Co-authored-by: <agent-name> <agent@example.invalid>`.
 
-## Git discipline
-- One branch per paper/feature: `paper/<slug>` or `feat/<what>`.
-- `git pull --rebase --autostash` before pushing. Never force-push `main`.
-- One file per commit when possible; conventional messages
-  (`paper:`, `fix:`, `ci:`, `docs:`, `chore:`).
-- Never commit PDFs, aux files, or `.env` (all gitignored).
+## Authority (hard limits)
+- Agents may: create branches, push branches, open PRs, run all gates.
+- Agents may NOT: merge PRs, push to `main`, approve PRs, edit `infra/`,
+  `.github/workflows/`, `docker-compose*.yml` without a human-approved plan.
+- `main` merges are human-only after 1 review + green CI (`latex-build`, `cite-check`, `pre-commit`).
 
-## Editing limits
-- Never edit `docker-compose.yml` images or `.cls`/`.bst` files.
-- `latexindent.yaml`, `.chktexrc`, `.latexmkrc` change only with human approval.
-- Anonymized review builds (when asked): anonymous mode + SubmissionID,
-  scrub PDF metadata, no self-identifying prose; `git log` must stay clean.
+## Done = all of
+1. `make lint paper verify-refs` green locally (or identical CI jobs green).
+2. Every number in prose matches a table/figure/log value.
+3. Every DOI resolves (script-checked, not claimed).
+4. PR description lists what changed + the verification run.
+5. No PDFs/aux/`.env`/anonymous.flag committed (`git status --porcelain` shows only sources).
+
+## Never
+- Read `.env` contents into chat/commits. No secrets in repo, ever.
+- Edit images/`.cls`/`.bst`, or `git push --force` (owner-only `--force-with-lease` on your own branch).
+- Commit build artifacts — CI publishes PDFs as artifacts/Releases.

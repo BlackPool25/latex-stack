@@ -1,0 +1,12 @@
+# LaTeX toolchain, containerized. Pinned by digest — the ONLY immutability
+# guarantee for TeX Live (Debian layer underneath rebuilds monthly).
+# Re-resolve with: docker inspect --format='{{index .RepoDigests 0}}' IMAGE
+services:
+  toolchain:
+    image: texlive/texlive:TL2025-historic@sha256:dbd65d778eb83de9b45fb0a8deb3afe44cbbaba2272e4e1e644e94dda52c7109
+    user: "${UID:-1000}:${GID:-1000}"
+    volumes:
+      - ./paper:/work
+    working_dir: /work
+    network_mode: none
+    command: ["sleep", "infinity"]

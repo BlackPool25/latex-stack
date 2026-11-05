@@ -1,11 +1,28 @@
+%! TEX program = lualatex
 \documentclass[conference]{IEEEtran}
 % LuaLaTeX build. Do NOT load fontspec (breaks IEEEtran metrics).
 \usepackage{cite}
 \usepackage{amsmath,amssymb}
 \usepackage{graphicx}
+\usepackage{booktabs}
 \usepackage[hidelinks]{hyperref} % hidelinks: no colored boxes (eXpress-safe)
 
+% Single-source anonymity: `make review` creates anonymous.flag, `make final`
+% and normal `make paper` builds ensure it is absent. Never commit the flag.
+\newif\ifanonymous%
+\IfFileExists{anonymous.flag}{\anonymoustrue}{\anonymousfalse}
+\ifanonymous%
+  \hypersetup{pdfauthor={}, pdftitle={Under review}}
+  \IfFileExists{draftwatermark.sty}{%
+    \usepackage[firstpageonly]{draftwatermark}%
+    \SetWatermarkText{UNDER REVIEW}\SetWatermarkScale{0.7}}{}
+\fi
+
 \title{Paper Title: Capitalize Major Words}
+\ifanonymous%
+\author{\IEEEauthorblockN{Anonymous Authors}
+\IEEEauthorblockA{Paper ID 000}}
+\else
 \author{\IEEEauthorblockN{First Author}
 \IEEEauthorblockA{Dept., University\\
 email@example.com}
@@ -13,16 +30,17 @@ email@example.com}
 \IEEEauthorblockN{Second Author}
 \IEEEauthorblockA{Dept., University\\
 email@example.com}}
+\fi
 
 \begin{document}
 \maketitle
 
 \begin{abstract}
-150--250 words. Problem, method, result, one number.
+    150--250 words. Problem, method, result, one number.
 \end{abstract}
 
 \begin{IEEEkeywords}
-keyword1, keyword2, keyword3
+    keyword1, keyword2, keyword3
 \end{IEEEkeywords}
 
 \input{sections/intro}

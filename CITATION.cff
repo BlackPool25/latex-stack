@@ -1,0 +1,14 @@
+cff-version: 1.2.0
+title: "REPLACE: Paper Title"
+type: conference-paper
+authors:
+  - family-names: Author
+    given-names: First
+    affiliation: "Dept., University"
+repository-code: "https://github.com/REPLACE-ORG/REPLACE-REPO"
+license: MIT
+preferred-citation:
+  type: conference-paper
+  title: "REPLACE: Paper Title"
+  collection-title: "Proc. REPLACE"
+  year: 2026

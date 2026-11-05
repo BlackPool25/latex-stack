@@ -1,3 +1,16 @@
-*.pdf binary
-*.png binary
-*.jpg binary
+# LaTeX-aware diffs: hunk headers show \section names.
+*.tex text diff=tex merge=texdriver
+*.bib text diff
+*.sty text diff=tex
+*.cls text diff=tex
+# Figures: generated binaries go to LFS; editable sources stay in git.
+*.png filter=lfs diff=lfs merge=lfs -text
+*.jpg filter=lfs diff=lfs merge=lfs -text
+*.pdf filter=lfs diff=lfs merge=lfs -text
+*.PNG filter=lfs diff=lfs merge=lfs -text
+figures/src/* -filter -diff -merge text
+# Never leak build or review artifacts via `git archive` / Zenodo zips.
+anonymous.flag export-ignore
+review.pdf export-ignore
+final.pdf export-ignore
+arxiv.tar.gz export-ignore

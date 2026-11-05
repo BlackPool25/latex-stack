@@ -1,35 +1,88 @@
-name: LaTeX gates
+name: latex
 on:
   push:
-    paths: ["paper/**", ".github/workflows/latex.yml"]
+    branches: [main]
+    paths: ["paper/**", "scripts/**", "Makefile", ".github/**", ".chktexrc", "latexindent.yaml", ".pre-commit-config.yaml"]
   pull_request:
-    paths: ["paper/**"]
+    paths: ["paper/**", "scripts/**", "Makefile", ".github/**", ".chktexrc", "latexindent.yaml", ".pre-commit-config.yaml"]
+  schedule:
+    - cron: "0 6 * * 1" # weekly template-rot check
   workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
 
 permissions:
   contents: read
+  pull-requests: write # preview bot comment only
+
+env:
+  # Re-resolve with: docker inspect --format='{{index .RepoDigests 0}}' texlive/texlive:TL2025-historic
+  TEX_IMAGE: texlive/texlive:TL2025-historic@sha256:dbd65d778eb83de9b45fb0a8deb3afe44cbbaba2272e4e1e644e94dda52c7109
 
 jobs:
-  build-and-lint:
-    runs-on: ubuntu-latest
-    container: texlive/texlive:latest
+  latex-build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    container:
+      image: ${{ env.TEX_IMAGE }}
+      options: --network none
     steps:
-      - uses: actions/checkout@v4
-      - name: ChkTeX gate (must-fail errors block)
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: ChkTeX gate (config in paper/.chktexrc)
+        run: cd paper && chktex -wall -n22 -n30 -e16 -q main.tex sections/*.tex
+      - name: Engine + class assertion
+        run: make check-engine
+      - name: Build paper
+        run: make paper USE_DOCKER=0
+      - name: Standalone arxiv check
         run: |
-          cd paper
-          chktex -wall -n22 -n30 -e16 -q main.tex sections/*.tex
-      - name: Build with latexmk (LuaLaTeX, warnings are errors)
-        run: |
-          cd paper
-          latexmk -lualatex -interaction=nonstopmode -halt-on-error main.tex
-      - name: No undefined references
-        run: |
-          cd paper
-          if grep -E "undefined|multiply defined|There were undefined" main.log; then
-            echo "UNDEFINED REFERENCES"; exit 1; fi
-      - name: Upload PDF artifact
-        uses: actions/upload-artifact@v4
+          make arxiv USE_DOCKER=0
+          rm -rf /tmp/ax && mkdir -p /tmp/ax && tar -xzf arxiv.tar.gz -C /tmp/ax
+          cd /tmp/ax && latexmk -lualatex -interaction=nonstopmode -halt-on-error main.tex
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: main-pdf
-          path: paper/main.pdf
+          name: paper-${{ github.sha }}
+          path: |
+            paper/main.pdf
+            paper/main.log
+            arxiv.tar.gz
+          retention-days: 7
+          if-no-files-found: error
+
+  cite-check:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with: { python-version: "3.12" }
+      - run: python3 scripts/verify-refs.py
+
+  pre-commit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    container:
+      image: ${{ env.TEX_IMAGE }}
+      options: --network none
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - run: pip install --quiet pre-commit && pre-commit run --all-files --show-diff-on-failure
+
+  preview:
+    needs: [latex-build]
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        with:
+          script: |
+            const body = `PDF Preview Ready — commit ${context.sha.slice(0,7)}: Artifacts → paper-${context.sha} (paper/main.pdf, 7-day retention).`;
+            const { data: comments } = await github.rest.issues.listComments({ ...context.repo, issue_number: context.issue.number });
+            const mine = comments.find(c => c.body.startsWith('PDF Preview Ready'));
+            mine ? github.rest.issues.updateComment({ ...context.repo, comment_id: mine.id, body })
+                 : github.rest.issues.createComment({ ...context.repo, issue_number: context.issue.number, body });

@@ -1,50 +1,32 @@
-# Multi-machine sync
+# Sync model — GitHub is the truth, every machine is a peer
 
-GitHub is the source of truth. Aldine holds a live editing copy;
-the repo holds the history. Never treat two Aldine instances as peers.
+There is exactly one shared state: the GitHub repo. Aldine (localhost),
+VSCodium, and agents on each laptop all read/write through git.
 
-## First-time setup (every machine)
-
-```bash
-git clone <repo-url> latex-stack && cd latex-stack
-./scripts/setup.sh    # .env + git sync policy + toolchain check + gate proof
-docker compose up -d  # Aldine at http://localhost:8080
-```
-
-(`setup.sh` applies the sync policy as repo-local git config, so every
-machine and teammate gets rebase + autostash + prune automatically.)
-
-## Daily loop
-
-```bash
-make update                 # git rebase-pull + fresh images + restart
-# ... edit in VSCodium and/or Aldine ...
-git checkout -b paper/<slug>
-git add paper/sections/results.tex paper/refs.bib
-git commit -m "paper: add throughput results + 2 cites"
-make lint && make paper
-git push -u origin paper/<slug>   # open a PR; CI runs the gates
-```
-
-## Second computer picks up work
-
+## Daily loop (every machine, humans and agents)
 ```bash
 git fetch --all --prune
-git checkout paper/<slug>   # or: git pull --rebase --autostash on main
-make paper                  # rebuilds from history; latexmk -g if stale
+git pull --rebase --autostash   # your branches only; main stays fast-forward
+# ... edit (Aldine: use its Push/Pull buttons, same thing underneath) ...
+make lint paper verify-refs
+git push
 ```
 
-## Conflicts (.tex)
+## Two machines, one branch — the only procedure
+1. Machine A pushes. Machine B runs `git pull --rebase --autostash`.
+2. `.tex` conflict? Markers land in the file; open it, keep BOTH sentences
+   unless they say the same thing (sentence-per-line makes this a 30s job).
+3. `git add <file> && git rebase --continue`, then `make paper`, then push.
+4. Never `push --force` on a shared branch. Your own branch with your own
+   unpushed... no — even then, prefer a fixup commit. Force is banned by the
+   ruleset on `main` and by convention everywhere else.
 
-1. `git status` — open each conflicted file in VSCodium, keep both sides'
-   prose where valid, keep only one copy of labels/cite keys.
-2. Never keep both `<<<<<<<` markers; never union-merge blindly.
-3. Re-run `make lint && make paper` before `git add`.
-4. Never force-push `main`. Force-push a feature branch only if you own it:
-   `git push --force-with-lease`.
+## Aldine rule (read carefully)
+Aldine mounts the SAME clone you push from (`./paper` bind or volume copy —
+see docs/setup.md option A/B). One editing place at a time: if Aldine has
+unsaved work, don't edit those files in VSCodium until Aldine's Pull/Push
+lands it in git. Git commits are the handoff, never the filesystem.
 
-## Aldine <-> repo rule
-
-- Edit in one place at a time. Before switching editors, commit or export.
-- Aldine has real git branches: push Aldine work to the repo branch, then
-  `git pull --rebase` on the other machine. No direct Aldine-to-Aldine sync.
+## Offline
+Work freely; commits are local. On reconnect: fetch, rebase, push.
+If someone merged first, you rebase — your work is never lost, only replayed.

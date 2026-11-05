@@ -1,6 +1,9 @@
-# Strict ChkTeX: TabSize 4, logical quotes, booktabs rule.
-TabSize 4
-QuoteStyle Logical
-UserWarnRegex {
-  \\(hline|cline)
+# Strict ChkTeX: flags live HERE, not in CI/Make invocations.
+# TabSize must match latexindent.yaml (4).
+TabSize = 4
+QuoteStyle = Logical
+# Hard bans for IEEE conference mode: exit nonzero on sight.
+UserWarnRegex
+{
+    fontspec|geometry|setspace|a4paper|usepackage\{times\}|\\vspace
 }

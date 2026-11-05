@@ -1,0 +1,22 @@
+name: release
+on:
+  push:
+    tags: ["v*"]
+permissions:
+  contents: write
+jobs:
+  attach:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    container:
+      image: texlive/texlive:TL2025-historic@sha256:dbd65d778eb83de9b45fb0a8deb3afe44cbbaba2272e4e1e644e94dda52c7109
+      options: --network none
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - run: make final USE_DOCKER=0 && make arxiv USE_DOCKER=0
+      - uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8b85266b0e65 # v2
+        with:
+          files: |
+            paper/final.pdf
+            arxiv.tar.gz
+          generate_release_notes: true

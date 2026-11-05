@@ -1,6 +1,10 @@
-defaultIndent: "  "
-maxLineLength: 80
+# Must stay in sync with paper/.chktexrc (TabSize 4).
+defaultIndent: "    "
+maxLineLength:
+  lineBreaks: 1
+  textWrap:
+    columns: 80
 modifyLineBreaks:
   textWrapOptions:
     columns: 80
-replacement: ""
+    when: "after"

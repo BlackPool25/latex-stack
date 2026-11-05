@@ -1,0 +1,8 @@
+# Highest-risk paths need their section owners. Everyone else: default reviewer.
+paper/sections/*.tex @TEAM-HANDLE
+paper/refs.bib @BIB-HANDLE
+paper/main.tex @TEAM-HANDLE
+paper/figures/ @TEAM-HANDLE
+/.latexmkrc .chktexrc latexindent.yaml / @TEAM-HANDLE
+docker-compose.yml Dockerfile docker/ Makefile / @TEAM-HANDLE
+.github/ infra/ scripts/ / @TEAM-HANDLE

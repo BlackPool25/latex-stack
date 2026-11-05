@@ -1,0 +1,10 @@
+# Per-repo git ergonomics for LaTeX. Activated by setup.sh via include.path.
+[diff "tex"]
+  xfuncname = "^(\\\\((sub)*section|chapter|part)\\{.*)$"
+[diff]
+  wordRegex = "[A-Za-z0-9_]+|[^[:space:]]"
+[merge "texdriver"]
+  name = latex-aware merge driver
+  driver = git merge-file --marker-size=3 --diff3 %O %A %B
+[core]
+  attributesfile = .gitattributes

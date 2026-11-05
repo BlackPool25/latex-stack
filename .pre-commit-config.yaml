@@ -1,0 +1,30 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-merge-conflict
+      - id: check-added-large-files
+        args: ["--maxkb=500"]
+  - repo: https://github.com/jumanjihouse/pre-commit-hook-yamlfmt
+    rev: 0.3.0
+    hooks:
+      - id: yamlfmt
+  - repo: local
+    hooks:
+      - id: chktex
+        name: chktex
+        entry: bash -c 'cd paper && chktex -wall -n22 -n30 -e16 -q main.tex sections/*.tex'
+        language: system
+        files: ^paper/.*\.tex$
+      - id: latexindent-check
+        name: latexindent-check
+        entry: bash -c 'cd paper && for f in main.tex sections/*.tex; do latexindent "$f" | diff -u "$f" - || exit 1; done'
+        language: system
+        files: ^paper/.*\.tex$
+      - id: verify-refs
+        name: verify-refs
+        entry: python3 scripts/verify-refs.py --offline
+        language: system
+        files: ^paper/.*\.(tex|bib)$
