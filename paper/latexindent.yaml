@@ -1,0 +1,6 @@
+defaultIndent: "  "
+maxLineLength: 80
+modifyLineBreaks:
+  textWrapOptions:
+    columns: 80
+replacement: ""

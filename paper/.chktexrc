@@ -1,0 +1,6 @@
+# Strict ChkTeX: TabSize 4, logical quotes, booktabs rule.
+TabSize 4
+QuoteStyle Logical
+UserWarnRegex {
+  \\(hline|cline)
+}

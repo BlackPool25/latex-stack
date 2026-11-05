@@ -1,0 +1,35 @@
+\documentclass[conference]{IEEEtran}
+% LuaLaTeX build. Do NOT load fontspec (breaks IEEEtran metrics).
+\usepackage{cite}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage[hidelinks]{hyperref} % hidelinks: no colored boxes (eXpress-safe)
+
+\title{Paper Title: Capitalize Major Words}
+\author{\IEEEauthorblockN{First Author}
+\IEEEauthorblockA{Dept., University\\
+email@example.com}
+\and
+\IEEEauthorblockN{Second Author}
+\IEEEauthorblockA{Dept., University\\
+email@example.com}}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+150--250 words. Problem, method, result, one number.
+\end{abstract}
+
+\begin{IEEEkeywords}
+keyword1, keyword2, keyword3
+\end{IEEEkeywords}
+
+\input{sections/intro}
+\input{sections/method}
+\input{sections/results}
+\input{sections/conclusion}
+
+\bibliographystyle{IEEEtran}
+\bibliography{refs}
+\end{document}
