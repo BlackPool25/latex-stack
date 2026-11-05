@@ -7,9 +7,8 @@ GitHub as source of truth + CI that blocks bad PDFs.
 
 ```bash
 git clone <repo-url> latex-stack && cd latex-stack
-cp .env.example .env
-docker compose up -d        # Aldine at http://localhost:8080
-make paper && make lint     # proves your toolchain
+./scripts/setup.sh    # .env + git sync policy + toolchain check + gate proof
+docker compose up -d  # Aldine at http://localhost:8080
 ```
 
 Needs: git, Docker, TeX Live (`texlive-basic texlive-binextra

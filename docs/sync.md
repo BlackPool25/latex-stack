@@ -7,18 +7,12 @@ the repo holds the history. Never treat two Aldine instances as peers.
 
 ```bash
 git clone <repo-url> latex-stack && cd latex-stack
-cp .env.example .env
-docker compose up -d        # Aldine at http://localhost:8080
-make paper && make lint     # proves the toolchain
+./scripts/setup.sh    # .env + git sync policy + toolchain check + gate proof
+docker compose up -d  # Aldine at http://localhost:8080
 ```
 
-One-time git safety config:
-
-```bash
-git config --global pull.rebase true
-git config --global rebase.autostash true
-git config --global fetch.prune true
-```
+(`setup.sh` applies the sync policy as repo-local git config, so every
+machine and teammate gets rebase + autostash + prune automatically.)
 
 ## Daily loop
 
