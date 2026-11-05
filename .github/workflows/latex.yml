@@ -18,7 +18,9 @@ permissions:
   pull-requests: write # preview bot comment only
 
 env:
-  # Re-resolve with: docker inspect --format='{{index .RepoDigests 0}}' texlive/texlive:TL2025-historic
+  # Digest duplicated literally in container.image below: the `env` context is
+  # not allowed there. Re-resolve with:
+  # docker inspect --format='{{index .RepoDigests 0}}' texlive/texlive:TL2025-historic
   TEX_IMAGE: texlive/texlive:TL2025-historic@sha256:dbd65d778eb83de9b45fb0a8deb3afe44cbbaba2272e4e1e644e94dda52c7109
 
 jobs:
@@ -26,7 +28,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     container:
-      image: ${{ env.TEX_IMAGE }}
+      image: texlive/texlive:TL2025-historic@sha256:dbd65d778eb83de9b45fb0a8deb3afe44cbbaba2272e4e1e644e94dda52c7109
       options: --network none
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
@@ -75,7 +77,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     container:
-      image: ${{ env.TEX_IMAGE }}
+      image: texlive/texlive:TL2025-historic@sha256:dbd65d778eb83de9b45fb0a8deb3afe44cbbaba2272e4e1e644e94dda52c7109
       options: --network none
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
