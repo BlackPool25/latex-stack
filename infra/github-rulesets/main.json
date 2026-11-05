@@ -1,7 +1,6 @@
 {
   "name": "latex-stack-default-branch",
-  "target": "~DEFAULT_BRANCH",
-  "enforcement": "active",
+  "target": "branch",
   "conditions": { "ref_name": { "include": ["refs/heads/main"], "exclude": [] } },
   "rules": [
     { "type": "creation" },
@@ -35,11 +34,11 @@
       "type": "commit_message_pattern",
       "parameters": {
         "name": "conventional prefix",
-        "negate": false,
-        "operator": "starts with",
+        "operator": "starts_with",
         "pattern": "^(paper|fix|ci|docs|chore|feat|refactor)(\\(.+\\))?: "
       }
     }
   ],
+  "enforcement": "active",
   "bypass_actors": []
 }
